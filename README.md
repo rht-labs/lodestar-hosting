@@ -1,2 +1,3 @@
-# lodestar-hosting
-Lodestar Hosting Environments App
+# LodeStar Hosting
+
+Tracking Hosting environments for engagements

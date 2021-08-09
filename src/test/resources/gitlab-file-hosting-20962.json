@@ -1,0 +1,29 @@
+{
+  "file_path": "engagement/hosting.json",
+  "file_name": "engagement/hosting.json",
+  "ref": "master",
+  "content": "WyB7CiAgICAidXVpZCIgOiAidXVpZDIiLAogICAgImNyZWF0ZWQiIDogIjIwMjEtMDctMjFUMTc6NTE6NTguNzc0MjUxIiwKICAgICJ1cGRhdGVkIiA6ICIyMDIxLTA3LTI3VDE5OjE0OjM1Ljc0OTQxMSIsCiAgICAiZW5nYWdlbWVudF91dWlkIiA6ICJzZWNvbmQiLAogICAgInByb2plY3RfaWQiIDogMjA5NjIsCiAgICAiZW52aXJvbm1lbnRfbmFtZSIgOiAiRVRMIE9TUDIiLAogICAgImFkZGl0aW9uYWxfZGV0YWlscyIgOiAiV2lsbCBwcm9iYWJseSBhbHNvIG5lZWQgdG8gYnVpbGQgb3V0IGFuIE9TUCB0ZW5hbnQyLiIsCiAgICAib2NwX2Nsb3VkX3Byb3ZpZGVyX25hbWUiIDogImF3cyIsCiAgICAib2NwX2Nsb3VkX3Byb3ZpZGVyX3JlZ2lvbiIgOiAidXMtd2VzdCIsCiAgICAib2NwX3BlcnNpc3RlbnRfc3RvcmFnZV9zaXplIiA6ICIxRyIsCiAgICAib2NwX3N1Yl9kb21haW4iIDogInJlZC0yIiwKICAgICJvY3BfdmVyc2lvbiIgOiAiNC45LjE2IiwKICAgICJvY3BfY2x1c3Rlcl9zaXplIiA6ICJncmFuZGUiLAogICAgInJlZ2lvbiI6ICJsYXRhbSIKICAgfSBdCg==",
+  "last_commit_id": "9cf2c785cd83327c7342a023365683f09a39e0a0",
+  "encoding": "base64",
+  "size": 619,
+  "branch": null,
+  "author_email": null,
+  "author_name": null,
+  "commit_message": null,
+  "decoded-for-reference":[ {
+    "uuid" : "uuid2",
+    "created" : "2021-07-21T17:51:58.774251",
+    "updated" : "2021-07-27T19:14:35.749411",
+    "engagement_uuid" : "second",
+    "project_id" : 20962,
+    "environment_name" : "ETL OSP2",
+    "additional_details" : "Will probably also need to build out an OSP tenant2.",
+    "ocp_cloud_provider_name" : "aws",
+    "ocp_cloud_provider_region" : "us-west",
+    "ocp_persistent_storage_size" : "1G",
+    "ocp_sub_domain" : "red-2",
+    "ocp_version" : "4.9.16",
+    "ocp_cluster_size" : "grande",
+    "region": "latam"
+   } ]
+ }

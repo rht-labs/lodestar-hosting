@@ -1,0 +1,29 @@
+{
+  "file_path": "engagement/hosting.json",
+  "file_name": "engagement/hosting.json",
+  "ref": "master",
+  "content": "WyB7CiAgICAidXVpZCIgOiAidXVpZCIsCiAgICAiY3JlYXRlZCIgOiAiMjAyMS0wNy0yMVQxNzo1MTo1OC43NzQyNTEiLAogICAgInVwZGF0ZWQiIDogIjIwMjEtMDctMjdUMTk6MTQ6MzUuNzQ5NDExIiwKICAgICJlbmdhZ2VtZW50X3V1aWQiIDogImNiNTcwOTQ1LWEyMDktNDBiYS05ZTQyLTYzYTc5OTNiYWY0ZCIsCiAgICAicHJvamVjdF9pZCIgOiAxMzA2NSwKICAgICJlbnZpcm9ubWVudF9uYW1lIiA6ICJFVEwgT1NQIiwKICAgICJhZGRpdGlvbmFsX2RldGFpbHMiIDogIldpbGwgcHJvYmFibHkgYWxzbyBuZWVkIHRvIGJ1aWxkIG91dCBhbiBPU1AgdGVuYW50LiIsCiAgICAib2NwX2Nsb3VkX3Byb3ZpZGVyX25hbWUiIDogIm90aGVyIiwKICAgICJvY3BfY2xvdWRfcHJvdmlkZXJfcmVnaW9uIiA6ICJvdGhlciIsCiAgICAib2NwX3BlcnNpc3RlbnRfc3RvcmFnZV9zaXplIiA6ICI1MDAwRyIsCiAgICAib2NwX3N1Yl9kb21haW4iIDogInJlZC0xIiwKICAgICJvY3BfdmVyc2lvbiIgOiAiNC43LjE2IiwKICAgICJvY3BfY2x1c3Rlcl9zaXplIiA6ICJwZXF1aXRvIiwKICAgICJyZWdpb24iOiAibmEiCiAgfSBdCg==",
+  "last_commit_id": "9cf2c785cd83327c7342a023365683f09a39e0a0",
+  "encoding": "base64",
+  "size": 619,
+  "branch": null,
+  "author_email": null,
+  "author_name": null,
+  "commit_message": null,
+  "decoded-for-reference": [ {
+    "uuid" : "uuid",
+    "created" : "2021-07-21T17:51:58.774251",
+    "updated" : "2021-07-27T19:14:35.749411",
+    "engagement_uuid" : "cb570945-a209-40ba-9e42-63a7993baf4d",
+    "project_id" : 13065,
+    "environment_name" : "ETL OSP",
+    "additional_details" : "Will probably also need to build out an OSP tenant.",
+    "ocp_cloud_provider_name" : "other",
+    "ocp_cloud_provider_region" : "other",
+    "ocp_persistent_storage_size" : "5000G",
+    "ocp_sub_domain" : "red-1",
+    "ocp_version" : "4.7.16",
+    "ocp_cluster_size" : "pequito",
+    "region": "latam"
+  } ]
+}
