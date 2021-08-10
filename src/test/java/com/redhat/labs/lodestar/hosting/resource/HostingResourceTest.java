@@ -29,7 +29,7 @@ import io.restassured.http.ContentType;
 @QuarkusTest
 @TestHTTPEndpoint(HostingResource.class)
 @QuarkusTestResource(ExternalApiWireMock.class)
-public class HostingResourceTest {
+class HostingResourceTest {
 
     @Inject
     HostingService hostingService;

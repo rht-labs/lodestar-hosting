@@ -34,6 +34,7 @@ import io.vertx.mutiny.core.eventbus.EventBus;
 @Consumes(MediaType.APPLICATION_JSON)
 @Tag(name = "Hosting", description = "Hosting environments for an Engagement")
 public class HostingResource {
+    private static final String COUNT_HEADER = "x-total-hosting";
     
     @Inject
     HostingService hostingService;
@@ -57,7 +58,7 @@ public class HostingResource {
         }
         
         return Response.ok(hostingEnvs).header("x-page", page).header("x-per-page", pageSize)
-                .header("x-total-hosting", hostingEnvCount).header("x-total-pages", (hostingEnvCount / pageSize) + 1).build();
+                .header(COUNT_HEADER, hostingEnvCount).header("x-total-pages", (hostingEnvCount / pageSize) + 1).build();
     }
     
     @GET
@@ -66,7 +67,7 @@ public class HostingResource {
         List<HostingEnvironment> hostingEnvs = hostingService.getHostingForEnagementUuid(engagementUuid);
         long hostingEnvCount = hostingService.countHostingForEnagementUuid(engagementUuid);
         
-        return Response.ok(hostingEnvs).header("x-total-hosting", hostingEnvCount).build();
+        return Response.ok(hostingEnvs).header(COUNT_HEADER, hostingEnvCount).build();
     }
     
     @PUT
@@ -74,8 +75,8 @@ public class HostingResource {
     @APIResponses(value = { @APIResponse(responseCode = "409", description = "This subdomain is already taken"),
             @APIResponse(responseCode = "200", description = "The hosting env was was saved to the db") })
     public Response updateHostingEnvironments(@PathParam(value = "engagementUuid") String uuid, List<HostingEnvironment> hostings,
-            @DefaultValue("moo@cow.com") @QueryParam(value = "authorEmail") String authorEmail,
-            @DefaultValue("Betsy Cow") @QueryParam(value = "authorName") String authorName) {
+            @DefaultValue("bot@bot.com") @QueryParam(value = "authorEmail") String authorEmail,
+            @DefaultValue("Hosting System") @QueryParam(value = "authorName") String authorName) {
 
         String projectIdAndCommitMessage = hostingService.updateHosting(uuid, hostings, authorEmail, authorName);
         
@@ -121,7 +122,7 @@ public class HostingResource {
         
         long hostingCount = hostingService.countHostingEnvironments();
         
-        return Response.ok().header("x-total-hosting", hostingCount).build();
+        return Response.ok().header(COUNT_HEADER, hostingCount).build();
     }
     
     
