@@ -100,7 +100,7 @@ public class HostingService {
 
     @Transactional
     public long purge() {
-        LOGGER.info("Purging participants db");
+        LOGGER.info("Purging hosting db");
         return HostingEnvironment.deleteAll();
     }
 
@@ -165,10 +165,6 @@ public class HostingService {
     
     public boolean isValidSubdomain(String engagementUuid, String subdomain) {
         long taken = HostingEnvironment.countSubDomainOmitEngagementUuid(engagementUuid, subdomain);
-        String query = "ocpSubDomain = ?2 AND " + ENGAGEMENT_UUID + " != ?1";
-        List<HostingEnvironment> he = HostingEnvironment.list(query, engagementUuid, subdomain);
-        long count = HostingEnvironment.count(query, engagementUuid, subdomain);
-        LOGGER.debug("valid {}, {}, {}", taken, count, he);
         return taken == 0; //not taken by another engagement
     }
 
