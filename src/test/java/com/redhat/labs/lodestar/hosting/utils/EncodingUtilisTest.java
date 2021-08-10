@@ -6,7 +6,7 @@ import org.junit.jupiter.api.Test;
 
 import com.redhat.labs.lodestar.hosting.exception.HostingException;
 
-public class EncodingUtilisTest {
+class EncodingUtilisTest {
 
     @Test
     void testEmptyEncodeSource() {
