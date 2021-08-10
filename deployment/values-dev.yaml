@@ -1,0 +1,29 @@
+name: lodestar-hosting
+development: true
+
+imageName: "lodestar-hosting"
+imageTag: "latest"
+
+builderImage: registry.access.redhat.com/ubi8/openjdk-11
+builderImageTag: 1.3
+
+servicePort: 8080
+
+git:
+  uri: https://github.com/rht-labs/lodestar-hosting.git
+  ref: main
+
+db:
+  version: 12
+  user: challah
+  password: bread
+  name: hostingdb
+  url: jdbc:postgresql://localhost:5432/hostingdb
+
+api:
+  gitlab: http://gitlab.com
+  engagement: http://git-api:8080
+
+tokens:
+  webhook: nope
+  gitlab: nope
