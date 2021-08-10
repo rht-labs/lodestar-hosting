@@ -106,7 +106,7 @@ public class HostingService {
 
     @Transactional
     public void reloadEngagement(Engagement e) {
-        LOGGER.debug("Reloading {}", e);
+        LOGGER.trace("Reloading {}", e);
 
         if (e.getUuid() == null) {
             LOGGER.error("PROJECT {} DOES NOT HAVE AN ENGAGEMENT UUID ON THE DESCRIPTION", e.getProjectId());
@@ -124,7 +124,7 @@ public class HostingService {
                     hostingEnv.setCreated(LocalDateTime.ofEpochSecond(0L, 0, ZoneOffset.UTC));
                 }
             }
-            LOGGER.debug("reloaded engagement (about to persist) {} {}", e, hostingEnvs);
+            LOGGER.trace("reloaded engagement (about to persist) {} {}", e, hostingEnvs);
             deleteHostingEnvs(e.getUuid());
             HostingEnvironment.persist(hostingEnvs);
         }
@@ -158,8 +158,7 @@ public class HostingService {
         if(region.isEmpty()) {
             return HostingEnvironment.getColumnRollup(rollup);
         }
-        LOGGER.debug("en {}", HostingEnvironment.getHostingEnvironments(0, 10));
-        LOGGER.debug("rrrrr {}", HostingEnvironment.getColumnRollup(rollup, region));
+
         return HostingEnvironment.getColumnRollup(rollup, region);
     }
     
@@ -208,7 +207,7 @@ public class HostingService {
     }
 
     private String createCommitMessasge(Diff diff) {
-        LOGGER.debug("count by type {}", diff.countByType());
+        LOGGER.trace("count by type {}", diff.countByType());
         StringBuilder commit = new StringBuilder(commitMessagePrefix);
 
         if (diff.countByType().containsKey(NewObject.class)) {
@@ -253,7 +252,7 @@ public class HostingService {
             hostingEnv.setRegion(region);
         }
 
-        LOGGER.debug("filled out {}", hostingEnv);
+        LOGGER.trace("filled out {}", hostingEnv);
 
     }
 
@@ -262,7 +261,7 @@ public class HostingService {
         try {
             GitlabFile file = gitlabRestClient.getFile(projectIdOrPath, hostingEnvFile, branch);
             file.decodeFileAttributes();
-            LOGGER.debug("hosting file json for project {} {}", projectIdOrPath, file.getContent());
+            LOGGER.trace("hosting file json for project {} {}", projectIdOrPath, file.getContent());
             return json.fromJson(file.getContent());
         } catch (WebApplicationException ex) {
             if (ex.getResponse().getStatus() != 404) {
@@ -284,11 +283,9 @@ public class HostingService {
     @ConsumeEvent(value = UPDATE_EVENT, blocking = true)
     @Transactional
     public void updateHostingInGitlab(String message) {
-        LOGGER.debug("Gitlabbing hosting - {}", message);
+        LOGGER.trace("Gitlabbing hosting - {}", message);
 
         String[] uuidProjectMessageEmailName = message.split("\\|\\|");
-
-        LOGGER.debug("Project {}", uuidProjectMessageEmailName.length);
 
         List<HostingEnvironment> hostingEnvs = getHostingForEnagementUuid(uuidProjectMessageEmailName[0]);
 

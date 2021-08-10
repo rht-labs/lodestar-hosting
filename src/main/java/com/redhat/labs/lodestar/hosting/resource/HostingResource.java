@@ -74,8 +74,8 @@ public class HostingResource {
     @APIResponses(value = { @APIResponse(responseCode = "409", description = "This subdomain is already taken"),
             @APIResponse(responseCode = "200", description = "The hosting env was was saved to the db") })
     public Response updateHostingEnvironments(@PathParam(value = "engagementUuid") String uuid, List<HostingEnvironment> hostings,
-            @DefaultValue("moo@cow.com") @QueryParam(value = "authorEmail") String authorEmail,
-            @DefaultValue("Betsy Cow") @QueryParam(value = "authorName") String authorName) {
+            @DefaultValue("bot@bot.com") @QueryParam(value = "authorEmail") String authorEmail,
+            @DefaultValue("Hosting System") @QueryParam(value = "authorName") String authorName) {
 
         String projectIdAndCommitMessage = hostingService.updateHosting(uuid, hostings, authorEmail, authorName);
         
