@@ -1,4 +1,8 @@
 # Compiled class file
+.classpath
+.settings
+.project
+.adhoc
 *.class
 target/
 
