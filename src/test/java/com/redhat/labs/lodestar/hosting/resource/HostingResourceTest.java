@@ -47,7 +47,7 @@ class HostingResourceTest {
 
     @Test
     void testNoUpdateByUuid() {
-        List<HostingEnvironment> he = hostingService.getHostingForEnagementUuid("second");
+        List<HostingEnvironment> he = hostingService.getHostingForEngagementUuid("second");
 
         given().contentType(ContentType.JSON).pathParam("engagementUuid", "second").body(he).put("/engagements/{engagementUuid}").then()
                 .statusCode(200).body("size()", is(1)).header("x-total-hosting", equalTo("1"));
@@ -55,7 +55,7 @@ class HostingResourceTest {
 
     @Test
     void testUsedSubdomainUpdateByUuid() {
-        List<HostingEnvironment> he = hostingService.getHostingForEnagementUuid("second");
+        List<HostingEnvironment> he = hostingService.getHostingForEngagementUuid("second");
 
         assertEquals(1, he.size());
         he.get(0).setOcpSubDomain("red-1");
@@ -66,7 +66,7 @@ class HostingResourceTest {
 
     @Test
     void testUpdateByUuid() {
-        List<HostingEnvironment> he = hostingService.getHostingForEnagementUuid("second");
+        List<HostingEnvironment> he = hostingService.getHostingForEngagementUuid("second");
 
         assertEquals(1, he.size());
         he.get(0).setName("update");
