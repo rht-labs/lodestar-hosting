@@ -6,14 +6,14 @@ on:
 
 jobs:
   build-if-needed:
-    if: github.repository == 'rht-labs/lodestar-hosting'
+    if: github.repository == 'mcanoy/lodestar-hosting'
     runs-on: ubuntu-latest
     steps:
     - name: Check whether we need to build this or not
       id: need_to_build
       run: |
         function image_exists() {
-            curl --silent -f -lSL https://quay.io/v1/repositories/rht-labs/${{ github.repository }}/tags/$1 > /dev/null
+            curl --silent -f -lSL https://quay.io/v1/repositories/${{ github.repository }}/tags/$1 > /dev/null
         }
         if image_exists ${{ github.sha }}; then
             echo "Image ${{ github.sha }} exists - not building"
