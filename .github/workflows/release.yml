@@ -6,7 +6,7 @@ on:
 
 jobs:
   build-if-needed:
-    if: github.repository == 'mcanoy/lodestar-hosting'
+    if: github.repository == 'rht-labs/lodestar-hosting'
     runs-on: ubuntu-latest
     steps:
     - name: Check whether we need to build this or not
