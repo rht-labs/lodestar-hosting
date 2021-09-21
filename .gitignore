@@ -5,6 +5,7 @@
 .project
 .adhoc
 *.class
+.idea
 target/
 
 # Log file
