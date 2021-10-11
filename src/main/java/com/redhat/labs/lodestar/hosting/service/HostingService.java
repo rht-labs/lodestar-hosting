@@ -14,6 +14,8 @@ import javax.inject.Inject;
 import javax.transaction.Transactional;
 import javax.ws.rs.WebApplicationException;
 
+import com.google.gson.*;
+import com.redhat.labs.lodestar.hosting.model.*;
 import org.eclipse.microprofile.config.inject.ConfigProperty;
 import org.eclipse.microprofile.rest.client.inject.RestClient;
 import org.javers.core.Javers;
@@ -27,9 +29,6 @@ import org.javers.core.metamodel.clazz.EntityDefinition;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.redhat.labs.lodestar.hosting.model.Engagement;
-import com.redhat.labs.lodestar.hosting.model.GitlabFile;
-import com.redhat.labs.lodestar.hosting.model.HostingEnvironment;
 import com.redhat.labs.lodestar.hosting.model.HostingEnvironment.Rollup;
 import com.redhat.labs.lodestar.hosting.rest.client.EngagementApiRestClient;
 import com.redhat.labs.lodestar.hosting.rest.client.GitlabRestClient;
@@ -47,6 +46,8 @@ public class HostingService {
     public static final String NO_UPDATE = "noUpdate";
     
     private Javers javers;
+
+    Gson gson = new GsonBuilder().setPrettyPrinting().create();
     
     @PostConstruct
     void setUpJavers() {
@@ -93,7 +94,7 @@ public class HostingService {
         List<Engagement> engagements = engagementRestClient.getAllEngagementProjects();
 
         LOGGER.debug("Engagement count {}", engagements.size());
-        engagements.stream().forEach(this::reloadEngagement);
+        engagements.forEach(this::reloadEngagement);
 
         LOGGER.debug("refresh complete");
     }
@@ -168,8 +169,7 @@ public class HostingService {
     }
 
     @Transactional
-    public String updateHosting(String engagementUuid, List<HostingEnvironment> hostings, String authorEmail,
-            String authorName) {
+    public String updateHosting(String engagementUuid, List<HostingEnvironment> hostings) {
 
         Engagement engagement = engagementRestClient.getEngagement(engagementUuid);
 
@@ -257,22 +257,28 @@ public class HostingService {
     }
 
     private List<HostingEnvironment> getHostingEnvironmentsFromGitlab(String projectIdOrPath) {
+        String file = getFile(projectIdOrPath, hostingEnvFile);
+
+        return file == null ? Collections.emptyList() : json.fromJson(file);
+    }
+
+    private String getFile(String projectIdOrPath, String filePath) {
 
         try {
-            GitlabFile file = gitlabRestClient.getFile(projectIdOrPath, hostingEnvFile, branch);
+            GitlabFile file = gitlabRestClient.getFile(projectIdOrPath, filePath, branch);
             file.decodeFileAttributes();
             LOGGER.trace("hosting file json for project {} {}", projectIdOrPath, file.getContent());
-            return json.fromJson(file.getContent());
+            return file.getContent();
         } catch (WebApplicationException ex) {
             if (ex.getResponse().getStatus() != 404) {
                 throw ex;
             }
-            LOGGER.error("No hosting file found for {} {}", projectIdOrPath, ex.getMessage());
-            return Collections.emptyList();
+            LOGGER.error("No file {} found for {} {}", filePath, projectIdOrPath, ex.getMessage());
         } catch (RuntimeException ex) {
-            LOGGER.error("Failure retrieving file {} {}", projectIdOrPath, ex.getMessage(), ex);
-            return Collections.emptyList();
+            LOGGER.error("Failure file {} {} {}", projectIdOrPath, filePath, ex.getMessage(), ex);
         }
+
+        return null;
     }
 
     /**
@@ -295,8 +301,36 @@ public class HostingService {
                 .authorEmail(uuidProjectMessageEmailName[3]).authorName(uuidProjectMessageEmailName[4]).build();
         file.encodeFileAttributes();
 
-        gitlabRestClient.updateFile(uuidProjectMessageEmailName[1], hostingEnvFile, file);
+        String legacyFile = getFile(uuidProjectMessageEmailName[1], "engagement.json");
+        String engagementFile = createLegacyJson(legacyFile, content);
+
+        List<GitlabAction> actions = List.of(
+                GitlabAction.builder().filePath(hostingEnvFile).content(content).build(),
+                GitlabAction.builder().filePath("engagement.json").content(engagementFile).build()
+        );
+
+        GitlabCommit commit = GitlabCommit.builder().commitMessage(uuidProjectMessageEmailName[2]).branch(branch)
+                .authorEmail(uuidProjectMessageEmailName[3]).authorName(uuidProjectMessageEmailName[4])
+                .actions(actions).build();
+
+        gitlabRestClient.createCommit(uuidProjectMessageEmailName[1], commit);
+
         LOGGER.debug("Gitlab hosting updated - {}", uuidProjectMessageEmailName[0]);
 
+    }
+
+    String createLegacyJson(String engagementJson, String hostingEnvsJson) {
+
+        JsonElement element = gson.fromJson(engagementJson, JsonElement.class);
+        JsonObject engagement = element.getAsJsonObject();
+
+        element = gson.fromJson(hostingEnvsJson, JsonElement.class);
+        JsonArray hostingEnvironments = element.getAsJsonArray();
+
+        engagement.add("hosting_environments", element);
+        JsonObject sorted = new JsonObject();
+        engagement.entrySet().stream().sorted(Map.Entry.comparingByKey()).forEach(es -> sorted.add(es.getKey(), es.getValue()));
+
+        return gson.toJson(sorted);
     }
 }

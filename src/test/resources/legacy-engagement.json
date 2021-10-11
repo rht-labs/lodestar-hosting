@@ -1,0 +1,47 @@
+{
+  "archive_date": "2021-10-17T00:00:00.000Z",
+  "artifacts": [
+
+  ],
+  "creation_details": {
+    "created_by_email": "jim@bob.com",
+    "created_by_user": "Jim Bob",
+    "created_on": "2021-09-01T19:30:10.469496Z"
+  },
+  "customer_contact_email": "kim@bob.com",
+  "customer_contact_name": "Kim Bob",
+  "customer_name": "RedHat",
+  "end_date": "2021-09-17T00:00:00.000Z",
+  "engagement_lead_email": "slim@bob.com",
+  "engagement_lead_name": "Slim Bob",
+  "engagement_region": "dev",
+  "engagement_type": "Residency",
+  "engagement_users": [
+
+  ],
+  "hosting_environments": [
+    {
+      "uuid": "heuuid1",
+      "environment_name": "old",
+      "ocp_cloud_provider_name": "ec2",
+      "ocp_cloud_provider_region": "eu-north-93",
+      "ocp_cluster_size": "small",
+      "ocp_persistent_storage_size": "50G",
+      "ocp_sub_domain": "mold",
+      "ocp_version": "4.6.21"
+    }
+  ],
+  "launch": {
+    "launched_by": "Slim Bob",
+    "launched_by_email": "slim@bob.com",
+    "launched_date_time": "2021-09-01T19:31:01.824922Z"
+  },
+  "project_id": 1,
+  "project_name": "Bobbie Boogie",
+  "public_reference": false,
+  "start_date": "2021-09-02T00:00:00.000Z",
+  "technical_lead_email": "grim@bob.com",
+  "technical_lead_name": "Grim Bob",
+  "timezone": "America/Denver",
+  "uuid": "euuid1"
+}

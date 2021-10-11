@@ -78,7 +78,7 @@ public class HostingResource {
             @DefaultValue("bot@bot.com") @QueryParam(value = "authorEmail") String authorEmail,
             @DefaultValue("Hosting System") @QueryParam(value = "authorName") String authorName) {
 
-        String projectIdAndCommitMessage = hostingService.updateHosting(uuid, hostings, authorEmail, authorName);
+        String projectIdAndCommitMessage = hostingService.updateHosting(uuid, hostings);
         
         if(!HostingService.NO_UPDATE.equals(projectIdAndCommitMessage)) {
             String message = String.format("%s||%s||%s||%s", uuid, projectIdAndCommitMessage, authorEmail, authorName);

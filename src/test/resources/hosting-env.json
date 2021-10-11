@@ -1,0 +1,13 @@
+[
+  {
+    "uuid": "heuuid1",
+    "environment_name": "env1",
+    "ocp_cloud_provider_name": "ec2",
+    "ocp_cloud_provider_region": "eu-north-3",
+    "ocp_cluster_size": "small",
+    "ocp_persistent_storage_size": "50G",
+    "ocp_sub_domain": "test",
+    "ocp_version": "5.0.1",
+    "region": "dev"
+  }
+]

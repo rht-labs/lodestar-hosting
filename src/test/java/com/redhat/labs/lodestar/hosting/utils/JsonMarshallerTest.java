@@ -7,11 +7,13 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
 
+import io.quarkus.test.junit.QuarkusTest;
 import org.junit.jupiter.api.Test;
 
 import com.redhat.labs.lodestar.hosting.exception.HostingException;
 import com.redhat.labs.lodestar.hosting.model.HostingEnvironment;
 
+@QuarkusTest
 class JsonMarshallerTest {
     
     @Test
@@ -59,7 +61,7 @@ class JsonMarshallerTest {
     }
     
     @Test
-    void testFormatting() {
+    void testFromFormatting() {
         String obj = "{}";
         
         JsonMarshaller json = new JsonMarshaller();

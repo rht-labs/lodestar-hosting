@@ -22,11 +22,10 @@ import com.redhat.labs.lodestar.hosting.model.Engagement;
 @RegisterProvider(value = RestClientResponseMapper.class, priority = 50)
 @Produces("application/json")
 @Consumes("application/json")
-@Path("/api/v1/engagements")
+@Path("/api/v2/engagements")
 public interface EngagementApiRestClient {
 
     @GET
-    @Path("/projects")
     List<Engagement> getAllEngagementProjects();
     
     @GET
@@ -34,6 +33,6 @@ public interface EngagementApiRestClient {
     Engagement getProject(@PathParam("engagementUuid") String engagementUuid, @QueryParam("mini") boolean mini);
     
     @GET
-    @Path("/uuid/{engagementUuid}")
+    @Path("/{engagementUuid}")
     Engagement getEngagement(@PathParam("engagementUuid") String engagementUuid);
 }
