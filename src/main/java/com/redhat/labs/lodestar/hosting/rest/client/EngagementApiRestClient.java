@@ -26,13 +26,9 @@ import com.redhat.labs.lodestar.hosting.model.Engagement;
 public interface EngagementApiRestClient {
 
     @GET
-    List<Engagement> getAllEngagementProjects();
+    List<Engagement> getAllEngagements();
     
     @GET
-    @Path("/projects/{engagementUuid}")
-    Engagement getProject(@PathParam("engagementUuid") String engagementUuid, @QueryParam("mini") boolean mini);
-    
-    @GET
-    @Path("/{engagementUuid}")
+    @Path("{engagementUuid}")
     Engagement getEngagement(@PathParam("engagementUuid") String engagementUuid);
 }

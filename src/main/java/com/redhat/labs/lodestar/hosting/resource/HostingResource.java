@@ -53,8 +53,8 @@ public class HostingResource {
             hostingEnvCount = hostingService.countHostingEnvironments();
             hostingEnvs = hostingService.getAllHostingEnvironments(page, pageSize);  
         } else {   
-            hostingEnvCount = hostingService.countHostingForEnagementSubset(engagementUuids);
-            hostingEnvs = hostingService.getHostingForEnagementSubset(page, pageSize, engagementUuids);
+            hostingEnvCount = hostingService.countHostingForEngagementSubset(engagementUuids);
+            hostingEnvs = hostingService.getHostingForEngagementSubset(page, pageSize, engagementUuids);
         }
         
         return Response.ok(hostingEnvs).header("x-page", page).header("x-per-page", pageSize)
@@ -64,8 +64,8 @@ public class HostingResource {
     @GET
     @Path("/engagements/{engagementUuid}")
     public Response getHostingEnvironmentsByEngagementUuid(@PathParam("engagementUuid") String engagementUuid) {
-        List<HostingEnvironment> hostingEnvs = hostingService.getHostingForEnagementUuid(engagementUuid);
-        long hostingEnvCount = hostingService.countHostingForEnagementUuid(engagementUuid);
+        List<HostingEnvironment> hostingEnvs = hostingService.getHostingForEngagementUuid(engagementUuid);
+        long hostingEnvCount = hostingService.countHostingForEngagementUuid(engagementUuid);
         
         return Response.ok(hostingEnvs).header(COUNT_HEADER, hostingEnvCount).build();
     }
@@ -92,7 +92,7 @@ public class HostingResource {
     @Path("/subdomain/valid/{engagementUuid}/{subdomain}")
     @APIResponses(value = { @APIResponse(responseCode = "409", description = "This subdomain is already taken"),
             @APIResponse(responseCode = "200", description = "The subdomain is available or already assigned to this engagement") })
-    public Response isSubddomaiinValid(@PathParam("engagementUuid") String engagementUuid, @PathParam("subdomain") String subdomain) {
+    public Response isSubdomainValid(@PathParam("engagementUuid") String engagementUuid, @PathParam("subdomain") String subdomain) {
         boolean isValid = hostingService.isValidSubdomain(engagementUuid, subdomain);
 
         if (isValid) {

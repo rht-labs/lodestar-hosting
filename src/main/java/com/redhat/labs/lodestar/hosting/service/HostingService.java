@@ -51,7 +51,7 @@ public class HostingService {
     
     @PostConstruct
     void setUpJavers() {
-        List<String> ignoredProps = Arrays.asList(new String[] { "id", "created", "updated", "projectId", "ocpMajorVersion", "ocpMinorVersion", "region" });
+        List<String> ignoredProps = Arrays.asList("id", "created", "updated", "projectId", "ocpMajorVersion", "ocpMinorVersion", "region");
         javers = JaversBuilder.javers().withListCompareAlgorithm(ListCompareAlgorithm.LEVENSHTEIN_DISTANCE)
                 .registerEntity(new EntityDefinition(HostingEnvironment.class, "uuid", ignoredProps)).build();
     }
@@ -91,7 +91,7 @@ public class HostingService {
     @Transactional
     public void refresh() {
 
-        List<Engagement> engagements = engagementRestClient.getAllEngagementProjects();
+        List<Engagement> engagements = engagementRestClient.getAllEngagements();
 
         LOGGER.debug("Engagement count {}", engagements.size());
         engagements.forEach(this::reloadEngagement);
@@ -120,7 +120,7 @@ public class HostingService {
                 fillOutHostingEnvironment(hostingEnv, e.getUuid(), null, e.getProjectId()); //region should be in the gitlab file already
 
                 if (hostingEnv.getUuid() != null && hostingEnv.getCreated() == null) {
-                    LOGGER.error("Hosting env {} for enagement {} did not have a create date set this is INCORRECT. Setting to now",
+                    LOGGER.error("Hosting env {} for engagement {} did not have a create date set this is INCORRECT. Setting to now",
                             hostingEnv.getUuid(), hostingEnv.getEngagementUuid());
                     hostingEnv.setCreated(LocalDateTime.ofEpochSecond(0L, 0, ZoneOffset.UTC));
                 }
@@ -139,19 +139,19 @@ public class HostingService {
         return HostingEnvironment.getHostingEnvironments(page, pageSize);
     }
 
-    public long countHostingForEnagementUuid(String engagementUuid) {
+    public long countHostingForEngagementUuid(String engagementUuid) {
         return HostingEnvironment.countByEnagementUuid(engagementUuid);
     }
 
-    public List<HostingEnvironment> getHostingForEnagementUuid(String engagementUuid) {
+    public List<HostingEnvironment> getHostingForEngagementUuid(String engagementUuid) {
         return HostingEnvironment.getByEnagementUuid(engagementUuid);
     }
 
-    public long countHostingForEnagementSubset(List<String> engagementUuids) {
+    public long countHostingForEngagementSubset(List<String> engagementUuids) {
         return HostingEnvironment.countByEngagementSubset(engagementUuids);
     }
 
-    public List<HostingEnvironment> getHostingForEnagementSubset(int page, int pageSize, List<String> engagementUuids) {
+    public List<HostingEnvironment> getHostingForEngagementSubset(int page, int pageSize, List<String> engagementUuids) {
         return HostingEnvironment.getByEngagementSubset(page, pageSize, engagementUuids);
     }
 
@@ -191,7 +191,7 @@ public class HostingService {
             deleteHostingEnvs(engagementUuid);
             HostingEnvironment.persist(hostings);
 
-            String commitMessage = createCommitMessasge(diff);
+            String commitMessage = createCommitMessage(diff);
 
             return String.format("%d||%s", engagement.getProjectId(), commitMessage);
         }
@@ -206,9 +206,10 @@ public class HostingService {
         return deletedRows;
     }
 
-    private String createCommitMessasge(Diff diff) {
+    private String createCommitMessage(Diff diff) {
         LOGGER.trace("count by type {}", diff.countByType());
         StringBuilder commit = new StringBuilder(commitMessagePrefix);
+        commit.append(String.format("%s %s", getEmoji(), getEmoji()));
 
         if (diff.countByType().containsKey(NewObject.class)) {
             commit.append(" added ");
@@ -293,7 +294,7 @@ public class HostingService {
 
         String[] uuidProjectMessageEmailName = message.split("\\|\\|");
 
-        List<HostingEnvironment> hostingEnvs = getHostingForEnagementUuid(uuidProjectMessageEmailName[0]);
+        List<HostingEnvironment> hostingEnvs = getHostingForEngagementUuid(uuidProjectMessageEmailName[0]);
 
         String content = json.toJson(hostingEnvs);
         GitlabFile file = GitlabFile.builder().filePath(hostingEnvFile).content(content)
@@ -325,12 +326,22 @@ public class HostingService {
         JsonObject engagement = element.getAsJsonObject();
 
         element = gson.fromJson(hostingEnvsJson, JsonElement.class);
-        JsonArray hostingEnvironments = element.getAsJsonArray();
 
         engagement.add("hosting_environments", element);
         JsonObject sorted = new JsonObject();
         engagement.entrySet().stream().sorted(Map.Entry.comparingByKey()).forEach(es -> sorted.add(es.getKey(), es.getValue()));
 
         return gson.toJson(sorted);
+    }
+
+    private String getEmoji() {
+        String bear = "\ud83d\udc3b";
+
+        int bearCodePoint = bear.codePointAt(bear.offsetByCodePoints(0, 0));
+        int mysteryAnimalCodePoint = bearCodePoint + new java.security.SecureRandom().nextInt(144);
+        char[] mysteryEmoji = { Character.highSurrogate(mysteryAnimalCodePoint),
+                Character.lowSurrogate(mysteryAnimalCodePoint) };
+
+        return String.valueOf(mysteryEmoji);
     }
 }
