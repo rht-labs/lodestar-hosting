@@ -177,9 +177,19 @@ public class HostingService {
             if (hostingEnv.getUuid() == null) {
                 hostingEnv.generateId();  // new - although legacy service (backend) will set this until deprecated
                 hostingEnv.setCreated(LocalDateTime.now());
+            } else if(hostingEnv.getCreated() == null) {
+                HostingEnvironment env = HostingEnvironment.find("uuid = ?1", hostingEnv.getUuid()).singleResult();
+                //Check db for existing and set unmodifiable values (Created)
+                if(env == null) {
+                    hostingEnv.setCreated(LocalDateTime.now());
+                } else {
+                    hostingEnv.setCreated(env.getCreated());
+                }
             }
+
             if(hostingEnv.getOcpSubDomain() != null && !isValidSubdomain(engagementUuid, hostingEnv.getOcpSubDomain())) {
-                throw new WebApplicationException(409);            }
+                throw new WebApplicationException(409);
+            }
             fillOutHostingEnvironment(hostingEnv, engagement.getUuid(), engagement.getRegion(), engagement.getProjectId());
         }
 
