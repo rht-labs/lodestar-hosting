@@ -1,17 +1,13 @@
 package com.redhat.labs.lodestar.hosting.mock;
 
-import static com.github.tomakehurst.wiremock.client.WireMock.aResponse;
-import static com.github.tomakehurst.wiremock.client.WireMock.get;
-import static com.github.tomakehurst.wiremock.client.WireMock.put;
-import static com.github.tomakehurst.wiremock.client.WireMock.stubFor;
-import static com.github.tomakehurst.wiremock.client.WireMock.urlEqualTo;
-
 import java.util.HashMap;
 import java.util.Map;
 
 import com.github.tomakehurst.wiremock.WireMockServer;
 
 import io.quarkus.test.common.QuarkusTestResourceLifecycleManager;
+
+import static com.github.tomakehurst.wiremock.client.WireMock.*;
 
 public class ExternalApiWireMock implements QuarkusTestResourceLifecycleManager {
 
@@ -23,29 +19,29 @@ public class ExternalApiWireMock implements QuarkusTestResourceLifecycleManager 
         
         String body = ResourceLoader.load("seed-engagement.json");
         
-        stubFor(get(urlEqualTo("/api/v1/engagements/projects")).willReturn(aResponse()
+        stubFor(get(urlEqualTo("/api/v2/engagements")).willReturn(aResponse()
                 .withHeader("Content-Type",  "application/json")
                 .withBody(body)
                 ));
         
         body = ResourceLoader.load("gitlab-project-13065.json");
         
-        stubFor(get(urlEqualTo("/api/v1/engagements/projects/cb570945-a209-40ba-9e42-63a7993baf4d")).willReturn(aResponse()
+
+        stubFor(get(urlEqualTo("/api/v2/engagements/cb570945-a209-40ba-9e42-63a7993baf4d")).willReturn(aResponse()
                 .withHeader("Content-Type",  "application/json")
                 .withBody(body)
                 ));
         
         body = ResourceLoader.load("gitlab-project-20962.json");
-        
-        stubFor(get(urlEqualTo("/api/v1/engagements/projects/second")).willReturn(aResponse()
+
+        stubFor(get(urlEqualTo("/api/v2/engagements/second")).willReturn(aResponse()
                 .withHeader("Content-Type",  "application/json")
                 .withBody(body)
                 ));
-        
-        
+
         body = ResourceLoader.load("engagement-second.json");
         
-        stubFor(get(urlEqualTo("/api/v1/engagements/uuid/second")).willReturn(aResponse()
+        stubFor(get(urlEqualTo("/api/v2/engagements/second")).willReturn(aResponse()
                 .withHeader("Content-Type",  "application/json")
                 .withBody(body)
                 ));
@@ -63,9 +59,15 @@ public class ExternalApiWireMock implements QuarkusTestResourceLifecycleManager 
                 .withHeader("Content-Type",  "application/json")
                 .withBody(body)
                 ));
-        
 
-        stubFor(put(urlEqualTo("/api/v4/projects/20962/repository/files/engagement%2Fhosting.json")).willReturn(aResponse()
+        body = ResourceLoader.loadGitlabFile("legacy-engagement-no-host.json");
+
+        stubFor(get(urlEqualTo("/api/v4/projects/20962/repository/files/engagement.json?ref=master")).willReturn(aResponse()
+                .withHeader("Content-Type",  "application/json")
+                .withBody(body)
+        ));
+
+        stubFor(post(urlEqualTo("/api/v4/projects/20962/repository/commits")).willReturn(aResponse()
                 .withHeader("Content-Type",  "application/json")
                 .withBody(body)
                 ));

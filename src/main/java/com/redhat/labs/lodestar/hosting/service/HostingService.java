@@ -14,6 +14,8 @@ import javax.inject.Inject;
 import javax.transaction.Transactional;
 import javax.ws.rs.WebApplicationException;
 
+import com.google.gson.*;
+import com.redhat.labs.lodestar.hosting.model.*;
 import org.eclipse.microprofile.config.inject.ConfigProperty;
 import org.eclipse.microprofile.rest.client.inject.RestClient;
 import org.javers.core.Javers;
@@ -27,9 +29,6 @@ import org.javers.core.metamodel.clazz.EntityDefinition;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.redhat.labs.lodestar.hosting.model.Engagement;
-import com.redhat.labs.lodestar.hosting.model.GitlabFile;
-import com.redhat.labs.lodestar.hosting.model.HostingEnvironment;
 import com.redhat.labs.lodestar.hosting.model.HostingEnvironment.Rollup;
 import com.redhat.labs.lodestar.hosting.rest.client.EngagementApiRestClient;
 import com.redhat.labs.lodestar.hosting.rest.client.GitlabRestClient;
@@ -47,10 +46,12 @@ public class HostingService {
     public static final String NO_UPDATE = "noUpdate";
     
     private Javers javers;
+
+    Gson gson = new GsonBuilder().setPrettyPrinting().create();
     
     @PostConstruct
     void setUpJavers() {
-        List<String> ignoredProps = Arrays.asList(new String[] { "id", "created", "updated", "projectId", "ocpMajorVersion", "ocpMinorVersion", "region" });
+        List<String> ignoredProps = Arrays.asList("id", "created", "updated", "projectId", "ocpMajorVersion", "ocpMinorVersion", "region");
         javers = JaversBuilder.javers().withListCompareAlgorithm(ListCompareAlgorithm.LEVENSHTEIN_DISTANCE)
                 .registerEntity(new EntityDefinition(HostingEnvironment.class, "uuid", ignoredProps)).build();
     }
@@ -90,10 +91,10 @@ public class HostingService {
     @Transactional
     public void refresh() {
 
-        List<Engagement> engagements = engagementRestClient.getAllEngagementProjects();
+        List<Engagement> engagements = engagementRestClient.getAllEngagements();
 
         LOGGER.debug("Engagement count {}", engagements.size());
-        engagements.stream().forEach(this::reloadEngagement);
+        engagements.forEach(this::reloadEngagement);
 
         LOGGER.debug("refresh complete");
     }
@@ -119,7 +120,7 @@ public class HostingService {
                 fillOutHostingEnvironment(hostingEnv, e.getUuid(), null, e.getProjectId()); //region should be in the gitlab file already
 
                 if (hostingEnv.getUuid() != null && hostingEnv.getCreated() == null) {
-                    LOGGER.error("Hosting env {} for enagement {} did not have a create date set this is INCORRECT. Setting to now",
+                    LOGGER.error("Hosting env {} for engagement {} did not have a create date set this is INCORRECT. Setting to now",
                             hostingEnv.getUuid(), hostingEnv.getEngagementUuid());
                     hostingEnv.setCreated(LocalDateTime.ofEpochSecond(0L, 0, ZoneOffset.UTC));
                 }
@@ -138,19 +139,19 @@ public class HostingService {
         return HostingEnvironment.getHostingEnvironments(page, pageSize);
     }
 
-    public long countHostingForEnagementUuid(String engagementUuid) {
+    public long countHostingForEngagementUuid(String engagementUuid) {
         return HostingEnvironment.countByEnagementUuid(engagementUuid);
     }
 
-    public List<HostingEnvironment> getHostingForEnagementUuid(String engagementUuid) {
+    public List<HostingEnvironment> getHostingForEngagementUuid(String engagementUuid) {
         return HostingEnvironment.getByEnagementUuid(engagementUuid);
     }
 
-    public long countHostingForEnagementSubset(List<String> engagementUuids) {
+    public long countHostingForEngagementSubset(List<String> engagementUuids) {
         return HostingEnvironment.countByEngagementSubset(engagementUuids);
     }
 
-    public List<HostingEnvironment> getHostingForEnagementSubset(int page, int pageSize, List<String> engagementUuids) {
+    public List<HostingEnvironment> getHostingForEngagementSubset(int page, int pageSize, List<String> engagementUuids) {
         return HostingEnvironment.getByEngagementSubset(page, pageSize, engagementUuids);
     }
 
@@ -168,8 +169,7 @@ public class HostingService {
     }
 
     @Transactional
-    public String updateHosting(String engagementUuid, List<HostingEnvironment> hostings, String authorEmail,
-            String authorName) {
+    public String updateHosting(String engagementUuid, List<HostingEnvironment> hostings) {
 
         Engagement engagement = engagementRestClient.getEngagement(engagementUuid);
 
@@ -177,9 +177,19 @@ public class HostingService {
             if (hostingEnv.getUuid() == null) {
                 hostingEnv.generateId();  // new - although legacy service (backend) will set this until deprecated
                 hostingEnv.setCreated(LocalDateTime.now());
+            } else if(hostingEnv.getCreated() == null) {
+                HostingEnvironment env = HostingEnvironment.find("uuid = ?1", hostingEnv.getUuid()).singleResult();
+                //Check db for existing and set unmodifiable values (Created)
+                if(env == null) {
+                    hostingEnv.setCreated(LocalDateTime.now());
+                } else {
+                    hostingEnv.setCreated(env.getCreated());
+                }
             }
+
             if(hostingEnv.getOcpSubDomain() != null && !isValidSubdomain(engagementUuid, hostingEnv.getOcpSubDomain())) {
-                throw new WebApplicationException(409);            }
+                throw new WebApplicationException(409);
+            }
             fillOutHostingEnvironment(hostingEnv, engagement.getUuid(), engagement.getRegion(), engagement.getProjectId());
         }
 
@@ -191,7 +201,7 @@ public class HostingService {
             deleteHostingEnvs(engagementUuid);
             HostingEnvironment.persist(hostings);
 
-            String commitMessage = createCommitMessasge(diff);
+            String commitMessage = createCommitMessage(diff);
 
             return String.format("%d||%s", engagement.getProjectId(), commitMessage);
         }
@@ -206,9 +216,10 @@ public class HostingService {
         return deletedRows;
     }
 
-    private String createCommitMessasge(Diff diff) {
+    private String createCommitMessage(Diff diff) {
         LOGGER.trace("count by type {}", diff.countByType());
         StringBuilder commit = new StringBuilder(commitMessagePrefix);
+        commit.append(String.format("%s %s", getEmoji(), getEmoji()));
 
         if (diff.countByType().containsKey(NewObject.class)) {
             commit.append(" added ");
@@ -257,22 +268,28 @@ public class HostingService {
     }
 
     private List<HostingEnvironment> getHostingEnvironmentsFromGitlab(String projectIdOrPath) {
+        String file = getFile(projectIdOrPath, hostingEnvFile);
+
+        return file == null ? Collections.emptyList() : json.fromJson(file);
+    }
+
+    private String getFile(String projectIdOrPath, String filePath) {
 
         try {
-            GitlabFile file = gitlabRestClient.getFile(projectIdOrPath, hostingEnvFile, branch);
+            GitlabFile file = gitlabRestClient.getFile(projectIdOrPath, filePath, branch);
             file.decodeFileAttributes();
             LOGGER.trace("hosting file json for project {} {}", projectIdOrPath, file.getContent());
-            return json.fromJson(file.getContent());
+            return file.getContent();
         } catch (WebApplicationException ex) {
             if (ex.getResponse().getStatus() != 404) {
                 throw ex;
             }
-            LOGGER.error("No hosting file found for {} {}", projectIdOrPath, ex.getMessage());
-            return Collections.emptyList();
+            LOGGER.error("No file {} found for {} {}", filePath, projectIdOrPath, ex.getMessage());
         } catch (RuntimeException ex) {
-            LOGGER.error("Failure retrieving file {} {}", projectIdOrPath, ex.getMessage(), ex);
-            return Collections.emptyList();
+            LOGGER.error("Failure file {} {} {}", projectIdOrPath, filePath, ex.getMessage(), ex);
         }
+
+        return null;
     }
 
     /**
@@ -287,7 +304,7 @@ public class HostingService {
 
         String[] uuidProjectMessageEmailName = message.split("\\|\\|");
 
-        List<HostingEnvironment> hostingEnvs = getHostingForEnagementUuid(uuidProjectMessageEmailName[0]);
+        List<HostingEnvironment> hostingEnvs = getHostingForEngagementUuid(uuidProjectMessageEmailName[0]);
 
         String content = json.toJson(hostingEnvs);
         GitlabFile file = GitlabFile.builder().filePath(hostingEnvFile).content(content)
@@ -295,8 +312,46 @@ public class HostingService {
                 .authorEmail(uuidProjectMessageEmailName[3]).authorName(uuidProjectMessageEmailName[4]).build();
         file.encodeFileAttributes();
 
-        gitlabRestClient.updateFile(uuidProjectMessageEmailName[1], hostingEnvFile, file);
+        String legacyFile = getFile(uuidProjectMessageEmailName[1], "engagement.json");
+        String engagementFile = createLegacyJson(legacyFile, content);
+
+        List<GitlabAction> actions = List.of(
+                GitlabAction.builder().filePath(hostingEnvFile).content(content).build(),
+                GitlabAction.builder().filePath("engagement.json").content(engagementFile).build()
+        );
+
+        GitlabCommit commit = GitlabCommit.builder().commitMessage(uuidProjectMessageEmailName[2]).branch(branch)
+                .authorEmail(uuidProjectMessageEmailName[3]).authorName(uuidProjectMessageEmailName[4])
+                .actions(actions).build();
+
+        gitlabRestClient.createCommit(uuidProjectMessageEmailName[1], commit);
+
         LOGGER.debug("Gitlab hosting updated - {}", uuidProjectMessageEmailName[0]);
 
+    }
+
+    String createLegacyJson(String engagementJson, String hostingEnvsJson) {
+
+        JsonElement element = gson.fromJson(engagementJson, JsonElement.class);
+        JsonObject engagement = element.getAsJsonObject();
+
+        element = gson.fromJson(hostingEnvsJson, JsonElement.class);
+
+        engagement.add("hosting_environments", element);
+        JsonObject sorted = new JsonObject();
+        engagement.entrySet().stream().sorted(Map.Entry.comparingByKey()).forEach(es -> sorted.add(es.getKey(), es.getValue()));
+
+        return gson.toJson(sorted);
+    }
+
+    private String getEmoji() {
+        String bear = "\ud83d\udc3b";
+
+        int bearCodePoint = bear.codePointAt(bear.offsetByCodePoints(0, 0));
+        int mysteryAnimalCodePoint = bearCodePoint + new java.security.SecureRandom().nextInt(144);
+        char[] mysteryEmoji = { Character.highSurrogate(mysteryAnimalCodePoint),
+                Character.lowSurrogate(mysteryAnimalCodePoint) };
+
+        return String.valueOf(mysteryEmoji);
     }
 }

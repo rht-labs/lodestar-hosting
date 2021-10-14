@@ -96,11 +96,11 @@ public class HostingEnvironment extends PanacheEntityBase {
     }
 
     public static long countByEnagementUuid(String engagementUuid) {
-        return HostingEnvironment.count(ENGAGEMENT_UUID, engagementUuid);
+        return count(ENGAGEMENT_UUID, engagementUuid);
     }
 
     public static List<HostingEnvironment> getByEnagementUuid(String engagementUuid) {
-        return HostingEnvironment.list(ENGAGEMENT_UUID, Sort.by("name").and("uuid"), engagementUuid);
+        return list(ENGAGEMENT_UUID, Sort.by("name").and("uuid"), engagementUuid);
     }
 
     public static List<HostingEnvironment> getHostingEnvironments(int page, int pageSize) {
@@ -108,7 +108,7 @@ public class HostingEnvironment extends PanacheEntityBase {
     }
 
     public static long countByEngagementSubset(List<String> engagementUuids) {
-        return HostingEnvironment.count(ENGAGEMENT_UUID + " IN (?1)", engagementUuids);
+        return count(ENGAGEMENT_UUID + " IN (?1)", engagementUuids);
     }
 
     public static List<HostingEnvironment> getByEngagementSubset(int page, int pageSize, List<String> engagementUuids) {
@@ -127,7 +127,7 @@ public class HostingEnvironment extends PanacheEntityBase {
                 "SELECT %s as %s, count(distinct %s) as total FROM HostingEnvironment GROUP BY ROLLUP(%s)", rollup.getColumn(),
                 rollup.getColumn(), ENGAGEMENT_UUID, rollup.getColumn());
 
-        return HostingEnvironment.getEntityManager().createQuery(query, Tuple.class).getResultStream()
+        return getEntityManager().createQuery(query, Tuple.class).getResultStream()
                 .collect(Collectors.toMap(
                         tuple -> ((String) tuple.get(rollup.getColumn())) == null ? "All"
                                 : ((String) tuple.get(rollup.getColumn())),
@@ -141,7 +141,7 @@ public class HostingEnvironment extends PanacheEntityBase {
                 "SELECT %s as %s, count(distinct %s) as total FROM HostingEnvironment WHERE region in :region GROUP BY ROLLUP(%s)", rollup.getColumn(),
                 rollup.getColumn(), ENGAGEMENT_UUID, rollup.getColumn());
 
-        return HostingEnvironment.getEntityManager().createQuery(query, Tuple.class).setParameter("region", region).getResultStream()
+        return getEntityManager().createQuery(query, Tuple.class).setParameter("region", region).getResultStream()
                 .collect(Collectors.toMap(
                         tuple -> ((String) tuple.get(rollup.getColumn())) == null ? "All"
                                 : ((String) tuple.get(rollup.getColumn())),
