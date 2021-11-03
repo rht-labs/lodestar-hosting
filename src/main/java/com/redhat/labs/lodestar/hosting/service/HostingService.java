@@ -9,13 +9,13 @@ import java.util.Map;
 
 import javax.annotation.PostConstruct;
 import javax.enterprise.context.ApplicationScoped;
-import javax.enterprise.event.Observes;
 import javax.inject.Inject;
 import javax.transaction.Transactional;
 import javax.ws.rs.WebApplicationException;
 
 import com.google.gson.*;
 import com.redhat.labs.lodestar.hosting.model.*;
+import io.quarkus.scheduler.Scheduled;
 import org.eclipse.microprofile.config.inject.ConfigProperty;
 import org.eclipse.microprofile.rest.client.inject.RestClient;
 import org.javers.core.Javers;
@@ -34,7 +34,6 @@ import com.redhat.labs.lodestar.hosting.rest.client.EngagementApiRestClient;
 import com.redhat.labs.lodestar.hosting.rest.client.GitlabRestClient;
 import com.redhat.labs.lodestar.hosting.utils.JsonMarshaller;
 
-import io.quarkus.runtime.StartupEvent;
 import io.quarkus.vertx.ConsumeEvent;
 
 @ApplicationScoped
@@ -76,7 +75,8 @@ public class HostingService {
     @ConfigProperty(name = "commit.message.prefix")
     String commitMessagePrefix;
 
-    void onStart(@Observes StartupEvent ev) {
+    @Scheduled(every = "5m",  delayed = "15s")
+    void checkDBPopulated() {
         long count = HostingEnvironment.count();
 
         LOGGER.debug("There are {} hosting environments in the hosting db.", count);
