@@ -20,6 +20,7 @@
     "additional_details" : "Will probably also need to build out an OSP tenant.",
     "ocp_cloud_provider_name" : "other",
     "ocp_cloud_provider_region" : "other",
+    "ocp_cloud_provider_availability_zone" : "one",
     "ocp_persistent_storage_size" : "5000G",
     "ocp_sub_domain" : "red-1",
     "ocp_version" : "4.7.16",

@@ -20,6 +20,7 @@
     "additional_details" : "Will probably also need to build out an OSP tenant2.",
     "ocp_cloud_provider_name" : "aws",
     "ocp_cloud_provider_region" : "us-west",
+    "ocp_cloud_provider_availability_zone" : "one",
     "ocp_persistent_storage_size" : "1G",
     "ocp_sub_domain" : "red-2",
     "ocp_version" : "4.9.16",

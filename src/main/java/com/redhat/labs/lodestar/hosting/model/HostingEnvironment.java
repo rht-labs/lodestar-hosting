@@ -74,6 +74,8 @@ public class HostingEnvironment extends PanacheEntityBase {
     private String ocpCloudProviderName;
     @JsonProperty("ocp_cloud_provider_region")
     private String ocpCloudProviderRegion;
+    @JsonProperty("ocp_cloud_provider_availability_zone")
+    private String ocpCloudProviderAvailabilityZone;
     @JsonProperty("ocp_persistent_storage_size")
     private String ocpPersistentStorageSize;
     @JsonProperty("ocp_sub_domain")

@@ -4,6 +4,7 @@
     "environment_name": "env1",
     "ocp_cloud_provider_name": "ec2",
     "ocp_cloud_provider_region": "eu-north-3",
+    "ocp_cloud_provider_availability_zone" : "one",
     "ocp_cluster_size": "small",
     "ocp_persistent_storage_size": "50G",
     "ocp_sub_domain": "test",
