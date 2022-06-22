@@ -2,7 +2,6 @@ package com.redhat.labs.lodestar.hosting.service;
 
 import com.redhat.labs.lodestar.hosting.mock.ResourceLoader;
 import io.quarkus.test.junit.QuarkusTest;
-import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -59,5 +58,4 @@ public class HostingServiceTest {
         String result = hostingService.createLegacyJson(legacyEngagement, hostingEnvs);
         assertEquals(expected, result);
     }
-
 }
