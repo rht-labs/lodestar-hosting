@@ -12,6 +12,7 @@ import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
 import javax.transaction.Transactional;
 import javax.ws.rs.WebApplicationException;
+import javax.ws.rs.core.Response;
 
 import com.google.gson.*;
 import com.redhat.labs.lodestar.hosting.model.*;
@@ -188,7 +189,8 @@ public class HostingService {
             }
 
             if(hostingEnv.getOcpSubDomain() != null && !isValidSubdomain(engagementUuid, hostingEnv.getOcpSubDomain())) {
-                throw new WebApplicationException(409);
+                String message = String.format("Subdomain name %s is invalid", hostingEnv.getOcpSubDomain());
+                throw new WebApplicationException(Response.status(409).entity(Map.of("lodestarMessage", message)).build());
             }
             fillOutHostingEnvironment(hostingEnv, engagement.getUuid(), engagement.getRegion(), engagement.getProjectId());
         }
