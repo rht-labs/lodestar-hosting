@@ -61,7 +61,7 @@ class HostingResourceTest {
         he.get(0).setOcpSubDomain("red-1");
 
         given().contentType(ContentType.JSON).pathParam("engagementUuid", "second").body(he).put("/engagements/{engagementUuid}").then()
-                .statusCode(409).body("lodestarMessage", equalTo("Subdomain name red-1 is invalid"));
+                .statusCode(409).body("lodestarMessage", equalTo("Subdomain red-1 has been taken by another engagement"));
     }
 
     @Test
