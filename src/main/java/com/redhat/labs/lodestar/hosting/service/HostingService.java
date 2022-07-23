@@ -189,7 +189,7 @@ public class HostingService {
             }
 
             if(hostingEnv.getOcpSubDomain() != null && !isValidSubdomain(engagementUuid, hostingEnv.getOcpSubDomain())) {
-                String message = String.format("Subdomain name %s is invalid", hostingEnv.getOcpSubDomain());
+                String message = String.format("Subdomain %s has been taken by another engagement", hostingEnv.getOcpSubDomain());
                 throw new WebApplicationException(Response.status(409).entity(Map.of("lodestarMessage", message)).build());
             }
             fillOutHostingEnvironment(hostingEnv, engagement.getUuid(), engagement.getRegion(), engagement.getProjectId());
