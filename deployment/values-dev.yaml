@@ -1,5 +1,7 @@
 name: lodestar-hosting
 development: true
+#if using quay then you should specify the image location
+buildImage: true
 
 imageName: "lodestar-hosting"
 imageTag: "latest"
